@@ -1,7 +1,7 @@
 const proxy = require('@webserverless/fc-express')
 const express = require('express');
 // const bodyParser = require('body-parser');
-const router = require('./routes')
+const router = require('./routes/index')
 const getRawBody = require('raw-body');
 
 const app = express();
@@ -24,6 +24,11 @@ const server = new proxy.Server(app);
 
 module.exports.handler = async (req, res, context) => {
     req.body = await getRawBody(req);
-    server.httpProxy(req, res, context);
-
+    if(req.headers.host !== '1528907418698530.cn-shenzhen-internal.fc.aliyuncs.com'){
+        console.log('非法请求')
+    }else{
+        server.httpProxy(req, res, context);
+        console.log(req)
+    }
+    
 };

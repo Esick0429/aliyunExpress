@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-const services = require('../services')
+const services = require('./services')
 /* GET users listing. */
 router.post('/addRole',services.addRole)
 router.get('/getRole',services.getRole)
