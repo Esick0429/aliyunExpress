@@ -1,0 +1,63 @@
+{
+    "$schema": {
+        "type": "object",
+        "required": [],
+        "properties": {
+            "_id": {
+                "description": "文档存储 ID，系统自动生成"
+            },
+            "userId": {
+                "type": "string",
+                "description": "用户id"
+            },
+            "avatar": {
+                "type": "string",
+                "description": "用户头像"
+            },
+            "username": {
+                "type": "string",
+                "description": "用户昵称"
+            },
+            "userphone": {
+                "type": "number",
+                "description": "用户手机"
+            },
+            "password": {
+                "type": "string",
+                "description": "密码"
+            },
+            "sex": {
+                "type": "string",
+                "description": "性别"
+            },
+            "role": {
+                "type": "string",
+                "description": "角色id"
+            },
+            "banned": {
+                "type": "boolean",
+                "description": "是否被禁用"
+            },
+            "createId": {
+                "type": "string",
+                "description": "创建人id"
+            },
+            "createName": {
+                "type": "string",
+                "description": "创建人"
+            },
+            "createTime": {
+                "type": "number",
+                "description": "申请时间，单位：毫秒"
+            },
+            "update_time": {
+                "bsonType": "long",
+                "description": "更新时间，时间戳，单位：毫秒"
+            },
+            "deleted": {
+                "bsonType": "bool",
+                "description": "逻辑删除字段"
+            }
+        }
+    }
+}

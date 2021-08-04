@@ -1,4 +1,4 @@
-const db = require('./db.js')
+const db = require('./db.js.js.js')
 // const Long = require('mongodb').Long
 const ObjectId = require('mongodb').ObjectId
 exports.pageing = (req,res)=>{
