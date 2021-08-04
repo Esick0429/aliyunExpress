@@ -1,4 +1,4 @@
-const db = require('./db.js.js.js')
+const db = require('../db/db.js')
 // const Long = require('mongodb').Long
 const ObjectId = require('mongodb').ObjectId
 exports.pageing = (req,res)=>{
@@ -27,7 +27,6 @@ exports.getRouter = (req,res) =>{
 exports.getRole = (req,res)=>{
     let roleList = []
     db.findAll('lewei_admin','role_info',{deleted:false},function(total,data) {
-        console.log(data)
         for( let i of data){
             roleList.push({
                 router: 
