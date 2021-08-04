@@ -1,5 +1,6 @@
+import { mongodbUrl } from '../../../config/test-config';
 var MongoClient = require('mongodb').MongoClient;
-var url = "mongodb://root:Lw135246@dds-wz975fe96170f9241.mongodb.rds.aliyuncs.com:3717,dds-wz975fe96170f9242.mongodb.rds.aliyuncs.com:3717/admin?replicaSet=mgset-46339342"
+var url = mongodbUrl
 var connect = function (callback) {
     MongoClient.connect(url, { useUnifiedTopology: true }, function (err, db) {
         if (err) throw err;
