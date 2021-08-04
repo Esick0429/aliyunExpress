@@ -28,7 +28,6 @@ module.exports.handler = async (req, res, context) => {
         console.log('非法请求')
     }else{
         server.httpProxy(req, res, context);
-        console.log(req)
     }
     
 };
