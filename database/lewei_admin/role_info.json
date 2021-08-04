@@ -1,0 +1,35 @@
+{
+    "schema": {
+      "bsonType": "object",
+      "required": [],
+      "properties": {
+        "_id": {
+          "description": "文档存储 ID，系统自动生成"
+        },
+        "role_name": {
+          "bsonType": "string",
+          "description": "角色名"
+        },
+        "router_id": {
+          "bsonType": "array",
+          "description": "路由权限id"
+        },
+        "router_name": {
+          "bsonType": "array",
+          "description": "路由权限名"
+        },
+        "create_time": {
+          "bsonType": "long",
+          "description": "创建时间，时间戳，单位：毫秒"
+        },
+        "update_time": {
+          "bsonType": "long",
+          "description": "更新时间，时间戳，单位：毫秒"
+        },
+        "deleted": {
+          "bsonType": "bool",
+          "description": "逻辑删除字段"
+        }
+      }
+    }
+  }
