@@ -1,7 +1,7 @@
 var redis = require('redis')
 var url = 'r-wz9nomv8cuauf0t1t7pd.redis.rds.aliyuncs.com'
 var {decrypt} = require('./token')
-var config = require('../../config/test-config').config
+var config = require('../config/config').config
 
 //设置存储token
 function setRedis(data,token){
@@ -21,7 +21,7 @@ function setRedis(data,token){
                 console.log(value)
                 return value
             })
-            redisClient.expire(data,600)//设置token过期10分钟
+            redisClient.expire(data,1200)//设置token过期20分钟
         }
         redisClient.quit();
     })
@@ -68,7 +68,7 @@ function delectRedis(data,callback){
         }else{
             let newToken = JSON.parse(decrypt(data));
             console.log(newToken);
-            let delToken = `zero_admin_token:${newToken.userId}:admin`
+            let delToken = `zero_admin_token:${newToken.userId}:admin-api`
             redisClient.del(delToken,function(err,value){
                 if(err) throw err
                 console.log(value)
@@ -83,7 +83,8 @@ function delectRedis(data,callback){
 /**
  * *验证token
  * data 请求的domain
- * token
+ * token 请求的token
+ * callback 返回验证token值
 */
 function decrypt_token(data,token,callback){
     console.log(data,token,config);
@@ -94,10 +95,10 @@ function decrypt_token(data,token,callback){
         //解析token
         let newToken = JSON.parse(decrypt(token));
         console.log(newToken);
-        if (newToken.appId == 'admin') { //验证是不是admin
+        if (newToken.appId == 'admin-api') { //验证是不是admin
 
             //获取token
-            getRedis(`zero_admin_token:${newToken.userId}:admin`,function(exist_token){
+            getRedis(`zero_admin_token:${newToken.userId}:admin-api`,function(exist_token){
                 console.log(exist_token,'11');
                 if (exist_token == token) {
                     callback(true)
@@ -106,7 +107,11 @@ function decrypt_token(data,token,callback){
                 }
             })
            
+        }else{
+            callback(false)
         }
+    }else{
+        callback(false)
     }
 
     

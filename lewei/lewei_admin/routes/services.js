@@ -118,8 +118,7 @@ exports.login = async (req,res)=>{
 
                 //创建token
                 let token = encrypt(tokendata)
-                console.log(token);
-                
+                console.log(token);                
                 
                 //存入token到redis
                 db.findAll('lewei_admin','user_info',{phone:userphone},function(total,data){
@@ -127,8 +126,7 @@ exports.login = async (req,res)=>{
                     console.log(key);
                     setRedis(key,token)
                 })
-                res.json({"code":0,"data":token,"message":'成功'})
-                
+                res.json({"code":0,"data":token,"message":'成功'})               
             }
             else{
                 res.end('密码错误')
@@ -151,20 +149,47 @@ exports.quit = (req,res)=>{
 }
 //路由
 exports.router = (req,res)=>{
+
     console.log(req.headers);
     let domain = req.headers.domain
     let token = req.headers.token
+    let user = JSON.parse(decrypt(token))//解析token获取userId
+
     decrypt_token(domain,token,function(value){//验证token
         console.log(value);
+
+        if (value) { //true验证成功
+            console.log(user.userId);
+            db.find('lewei_admin','user_info',{deleted:false,user_id:user.userId},function(user) {//查询roleId
+                console.log(user[0]);
+                db.find('lewei_admin','role_info',{deleted:false,_id:ObjectId(data[0].role_id)},function(role) { //通过roleId查询routerId
+                    console.log(role[0]);
+                    let arr = role[0].router_id
+                    for(var i= 0;i<arr.length;i++){
+                        db.findAll('lewei_admin','router_info',{_id:ObjectId(arr[i])},function(total,router){
+                            console.log(router[0]);
+                            var data = router[0].config
+                            res.json({"code":0,"data":data,"message":'成功'})
+                        })
+                    }
+                })
+            })
+        }
     })
-    //let data = decrypt(req.headers.token)
-    //console.log(data)
-    res.json({"code":0,"data":null,"message":'成功'})
+
+   
 }
 //新建用户
 exports.addUser = (req,res)=>{
     let userphone = req.body.userphone
+    let reg = /^1(3[0-9]|4[01456879]|5[0-35-9]|6[2567]|7[0-8]|8[0-9]|9[0-35-9])\d{8}$/
+    console.log(reg.test(userphone))
+    if (!reg.test(userphone)) { //验证手机号
+        return
+    }
     console.log(userphone);
+
+
     db.findAll('lewei_admin','user_info',{deleted:false,phone:userphone},function(total,data) {
         console.log(data);
         if (data[0]) { ///判断手机号是否存在

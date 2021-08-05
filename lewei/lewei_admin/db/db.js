@@ -25,6 +25,18 @@ exports.findAll = function (database, tablename, data, callback) {
     });
 }
 
+exports.find = function (database, tablename, data, callback) {
+    connect(function (db) {
+        //var total;
+        var dbbase = db.db(database);
+        dbbase.collection(tablename).find(data).toArray(function (err, data) {
+            if (err) throw err;
+            callback(data);
+            db.close();
+        });
+    });
+}
+
 //数据分页
 exports.pageing = function (database, tablename,data, now, num, sort, callback) {
     connect(function (db) {
