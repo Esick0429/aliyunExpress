@@ -21,7 +21,9 @@ app.use(express.urlencoded({extended:false}))
 app.use(express.json())
 app.use('/',router)
 const server = new proxy.Server(app);
-
+app.listen('4000',function(){
+    console.log('sdasdad')
+})
 module.exports.handler = async (req, res, context) => {
     req.body = await getRawBody(req);
     if(req.headers.host !== '1528907418698530.cn-shenzhen-internal.fc.aliyuncs.com'){
