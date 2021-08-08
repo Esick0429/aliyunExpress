@@ -25,16 +25,22 @@ exports.findAll = function (database, tablename, data, callback) {
     });
 }
 
-exports.find = function (database, tablename, data, callback) {
+exports.find = function(database,collectionName,json,callback){
+    if(!collectionName || !json ) throw '参数错误';
     connect(function (db) {
-        //var total;
-        var dbbase = db.db(database);
-        dbbase.collection(tablename).find(data).toArray(function (err, data) {
-            if (err) throw err;
-            callback(data);
-            db.close();
-        });
-    });
+        var dbbase = db.db(database)
+        return new Promise((resolve, reject) => {
+                let result = dbbase.collection(collectionName).find(json);
+                result.toArray((err,data)=>{
+                    if(!err){
+                        callback(data)
+                        resolve(data);
+                    }else{
+                        reject(err);
+                    }
+                })
+        })
+    })
 }
 
 //数据分页

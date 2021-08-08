@@ -10,11 +10,11 @@ router.post('/dRole',services.dRole)
 router.post('/updateInfo',services.updateInfo)
 
 //用户
-router.post('/user/login',services.login)
-router.post('/user/quit',services.quit)
-router.post('/user/router',services.router)
-router.post('/user/create',services.addUser)
-router.get('/user/list',services.getUser)
-router.delete('/user/*',services.dUser)
-router.post('/user/*/update',services.updateUser)
+router.post('/login',services.login)
+router.post('/quit',services.quit)
+router.post('/router',services.router)
+router.post('/create',services.addUser)
+router.get('/list',services.getUser)
+router.delete('/*',services.dUser)
+router.post('/update/*',services.updateUser)
 module.exports = router;

@@ -3,7 +3,7 @@ const express = require('express');
 // const bodyParser = require('body-parser');
 const router = require('./routes/index')
 const getRawBody = require('raw-body');
-
+const {decrypt_token} = require('./db/redis')
 const app = express();
 app.use('/', function (req, res, next) {
 	// 设置请求头为允许跨域
@@ -14,6 +14,19 @@ app.use('/', function (req, res, next) {
     res.header("Access-Control-Allow-Methods", "GET,POST");
     // res.header("Access-control-Allow-Orign","http://127.0.0.1:8080")
     // next()方法表示进入下一个路由
+
+    console.log(req.path)
+    if(req.path != '/login'){
+        let domain = req.headers.domain
+        let token = req.headers.token
+        decrypt_token(domain,token,function(value){//验证token
+            console.log(value);
+            if(!value){
+                res.send('token错误')
+                return
+            }
+        })
+    }
     next();
 });
 app.use(express.urlencoded({extended:false}))
@@ -21,9 +34,7 @@ app.use(express.urlencoded({extended:false}))
 app.use(express.json())
 app.use('/',router)
 const server = new proxy.Server(app);
-app.listen('4000',function(){
-    console.log('sdasdad')
-})
+
 module.exports.handler = async (req, res, context) => {
     req.body = await getRawBody(req);
     if(req.headers.host !== '1528907418698530.cn-shenzhen-internal.fc.aliyuncs.com'){

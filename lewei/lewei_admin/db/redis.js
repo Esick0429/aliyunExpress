@@ -2,10 +2,11 @@ var redis = require('redis')
 var url = 'r-wz9nomv8cuauf0t1t7pd.redis.rds.aliyuncs.com'
 var {decrypt} = require('./token')
 var config = require('../config/config').config
-
+//var url = config.redis_conf.host
+console.log(url);
 //设置存储token
-function setRedis(data,token){
-    const redisClient = redis.createClient(6379,url)
+function setRedis(data,token,callback){
+    const redisClient = redis.createClient({host:url,prot:6379,no_ready_check:true})
     redisClient.auth('Lw135246', () => {
         console.log('通过认证');
     })
@@ -16,16 +17,19 @@ function setRedis(data,token){
         if (err) {
             console.log(err);
         }else{
+            console.log(result);
+            console.log(typeof(data),'111',typeof(token));
             redisClient.set(data,token,function(err,value){
-                if(err) throw err
+                if(err) {
+                    throw err
+                }
                 console.log(value)
-                return value
-            })
-            redisClient.expire(data,1200)//设置token过期20分钟
-        }
-        redisClient.quit();
+                callback(value)
+                redisClient.expire(data,1200)//设置token过期20分钟
+                redisClient.quit();
+            })  
+        }   
     })
-    redisClient.set(data,token,redis.print)
 }
 
 //查找token
@@ -44,11 +48,11 @@ function getRedis(data,callback){
             redisClient.get(data,function(err,value){
                 if(err) throw err
                 console.log(value)
+                redisClient.expire(data,1200)//token延期
                 callback(value)
-                return value
-            })
+                redisClient.quit();
+            }) 
         }
-        redisClient.quit();
     }) 
 }
 /*
@@ -73,9 +77,9 @@ function delectRedis(data,callback){
                 if(err) throw err
                 console.log(value)
                 callback(value)
+                redisClient.quit();
             })
-        }
-        redisClient.quit();
+        } 
     }) 
 }
 
@@ -101,20 +105,20 @@ function decrypt_token(data,token,callback){
             getRedis(`zero_admin_token:${newToken.userId}:admin-api`,function(exist_token){
                 console.log(exist_token,'11');
                 if (exist_token == token) {
+                    
                     callback(true)
                 }else{
                     callback(false)
                 }
             })
-           
-        }else{
+        }
+        else{
             callback(false)
         }
-    }else{
-        callback(false)
     }
-
-    
+    else{
+        callback(false)
+    }    
 }
 
 module.exports = {
