@@ -65,7 +65,8 @@ var decrypt = function (crypted) {
  * @returns string
  */
 var passwordEncrypt = function(data){
-    let md5 = crypto.createHash('md5')
+    let key = 'gs8dsh32dfg/'
+    let md5 = crypto.createHash('md5',key)
     let newPas = md5.update(data).digest('hex')
     return newPas
 }
