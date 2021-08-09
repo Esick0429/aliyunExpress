@@ -159,15 +159,15 @@ exports.router = (req,res)=>{
 
     //获取router
     console.log(user.userId);
-    db.find('lewei_admin','user_info',{deleted:false,user_id:user.userId},function(user) {//查询roleId
+    db.find('lewei_admin','user_info',{deleted:false,user_id:user.userId},{create_time:1},function(user) {//查询roleId
         console.log(user[0]);
-        db.find('lewei_admin','role_info',{deleted:false,_id:ObjectId(user[0].role_id)},function(role) { //通过roleId查询routerId
+        db.find('lewei_admin','role_info',{deleted:false,_id:ObjectId(user[0].role_id)},{create_time:1},function(role) { //通过roleId查询routerId
             console.log(role[0]);
                     let arr = role[0].router_id
                     var data = []
                     const pp = new Promise( (resolve,reject)=>{
                         for(var i= 0;i<arr.length;i++){
-                            db.find('lewei_admin','router_info',{_id:ObjectId(arr[i])},function(res){//查找router——config
+                            db.find('lewei_admin','router_info',{_id:ObjectId(arr[i])},{create_time:1},function(res){//查找router——config
                                 console.log(res);
                                 data.push(res[0])
                                 if (data.length == arr.length) {
@@ -179,7 +179,15 @@ exports.router = (req,res)=>{
                    
                     pp.then((data)=>{
                         console.log(data,'22');
-                        res.json({"code":0,"data":{routerList:data},"message":'成功'})
+                        var result = []
+                        for (let index = 0; index < data.length; index++) {
+                            let object = {}
+                            object.routerName = data[index].router_name;
+                            object.config = data[index].config[0]
+                            console.log(object);
+                            result.push(object)
+                        }
+                        res.json({"code":0,"data":{routerList:result},"message":'成功'})
                     })
         })
     })

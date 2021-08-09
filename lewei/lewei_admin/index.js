@@ -14,13 +14,12 @@ app.use('/', function (req, res, next) {
     res.header("Access-Control-Allow-Methods", "GET,POST");
     // res.header("Access-control-Allow-Orign","http://127.0.0.1:8080")
     // next()方法表示进入下一个路由
-
-    console.log(req.path)
+        console.log(req.path)
     if(req.path != '/login'){
         let domain = req.headers.domain
         let token = req.headers.token
         decrypt_token(domain,token,function(value){//验证token
-            console.log(value);
+            console.log(value,'sadasd');
             if(!value){
                 res.send('token错误')
                 return
@@ -37,6 +36,7 @@ const server = new proxy.Server(app);
 
 module.exports.handler = async (req, res, context) => {
     req.body = await getRawBody(req);
+    console.log(req.headers)
     if(req.headers.host !== '1528907418698530.cn-shenzhen-internal.fc.aliyuncs.com'){
         console.log('非法请求')
     }else{

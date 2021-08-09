@@ -1,7 +1,7 @@
 var redis = require('redis')
 var url = 'r-wz9nomv8cuauf0t1t7pd.redis.rds.aliyuncs.com'
 var {decrypt} = require('./token')
-var config = require('../config/config').config
+var config = require('../config/config.js')
 //var url = config.redis_conf.host
 console.log(url);
 //设置存储token
