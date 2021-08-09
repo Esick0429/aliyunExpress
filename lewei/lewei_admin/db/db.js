@@ -1,6 +1,7 @@
 import { mongodbUrl } from '../../../config/test-config';
 var MongoClient = require('mongodb').MongoClient;
-var url = mongodbUrl
+var url = 'mongodb://root:Lw135246@dds-wz975fe96170f9241908-pub.mongodb.rds.aliyuncs.com:3717,dds-wz975fe96170f9242412-pub.mongodb.rds.aliyuncs.com:3717/admin?replicaSet=mgset-46339342'
+//var url = "mongodb://root:Lw135246@dds-wz975fe96170f9241.mongodb.rds.aliyuncs.com:3717,dds-wz975fe96170f9242.mongodb.rds.aliyuncs.com:3717/admin?replicaSet=mgset-46339342"
 var connect = function (callback) {
     MongoClient.connect(url, { useUnifiedTopology: true }, function (err, db) {
         if (err) throw err;
@@ -25,21 +26,39 @@ exports.findAll = function (database, tablename, data, callback) {
     });
 }
 
+exports.find = function(database,collectionName,json,callback){
+    if(!collectionName || !json ) throw '参数错误';
+    connect(function (db) {
+        var dbbase = db.db(database)
+        return new Promise((resolve, reject) => {
+                let result = dbbase.collection(collectionName).find(json);
+                result.toArray((err,data)=>{
+                    if(!err){
+                        callback(data)
+                        resolve(data);
+                    }else{
+                        reject(err);
+                    }
+                })
+        })
+    })
+}
+
 //数据分页
-exports.pageing = function (database, tablename, now, num, sort, callback) {
+exports.pageing = function (database, tablename,data, now, num, sort, callback) {
     connect(function (db) {
         var dbbase = db.db(database);
         var total;
         var dbbase = db.db(database);
-        dbbase.collection(tablename).find().count({}, function (err, res) {
+        dbbase.collection(tablename).find(data).count({}, function (err, res) {
             if (err) throw err;
             total = res;
         });
-        dbbase.collection(tablename).find().skip(now).limit(num).sort(sort).toArray(function (err, res) {
+        dbbase.collection(tablename).find(data).skip(now).limit(num).sort(sort).toArray(function (err, res) {
             if (err) throw err;
-            // console.log(res)
+            console.log(res)
 
-            callback(res);
+            callback(total,res);
             db.close();
         });
     });
