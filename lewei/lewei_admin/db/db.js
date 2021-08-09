@@ -27,12 +27,12 @@ exports.findAll = function (database, tablename, data, callback) {
     });
 }
 
-exports.find = function(database,collectionName,json,callback){
+exports.find = function(database,collectionName,json,sort,callback){
     if(!collectionName || !json ) throw '参数错误';
     connect(function (db) {
         var dbbase = db.db(database)
         return new Promise((resolve, reject) => {
-                let result = dbbase.collection(collectionName).find(json);
+                let result = dbbase.collection(collectionName).find(json).sort(sort);
                 result.toArray((err,data)=>{
                     if(!err){
                         callback(data)
