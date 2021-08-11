@@ -29,14 +29,14 @@ exports.findAll = async function (database, tablename, data) {
     return {total,res};
 }
 
-exports.find = async function(database,collectionName,json,sort,callback){
+exports.find = async function(database,collectionName,json,sort){
     if(!collectionName || !json ) throw '参数错误';
     const conn = await connect()
     const dbbase = conn.db(database);
-    let total = await dbbase.collection(tablename).find(data).count();
-    let res = dbbase.collection(collectionName).find(json).sort(sort).toArray();
+    //let total = await dbbase.collection(tablename).find(data).count();
+    let res =await dbbase.collection(collectionName).find(json).sort(sort).toArray();
     conn.close();
-    return {total,res};
+    return res;
 }
 
 //数据分页
