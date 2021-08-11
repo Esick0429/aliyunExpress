@@ -19,14 +19,17 @@ app.use('/', function (req, res, next) {
         let domain = req.headers.domain
         let token = req.headers.token
         //console.log(domain,token)
-        let  value = await decrypt_token(domain,token)//验证token
-        console.log(value ,'yz');
-        if(!value){
-            res.send('token错误')
-            return
-        }
+        let  value = await decrypt_token(domain,token,function(){//验证token
+            console.log(value ,'yz');
+            if(!value){
+                res.send('token错误')
+                return
+            }
+        })
+    }else{
+        next();
     }
-    next();
+    
 });
 app.use(express.urlencoded({extended:false}))
 // 处理json格式的参数
