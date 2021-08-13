@@ -1,6 +1,4 @@
 var MongoClient = require('mongodb').MongoClient;
-var url = "mongodb://root:Lw135246@dds-wz975fe96170f9241908-pub.mongodb.rds.aliyuncs.com:3717,dds-wz975fe96170f9242412-pub.mongodb.rds.aliyuncs.com:3717/admin?replicaSet=mgset-46339342";
-// var url = "mongodb://root:Lw135246@dds-wz975fe96170f9241.mongodb.rds.aliyuncs.com:3717,dds-wz975fe96170f9242.mongodb.rds.aliyuncs.com:3717/admin?replicaSet=mgset-46339342"
 var connect = function () {
     return new Promise(( resolve, reject ) => {
         MongoClient.connect(url, { useUnifiedTopology: true }, function (err, db) {
