@@ -5,7 +5,7 @@ const router = require('./routes/index')
 const getRawBody = require('raw-body');
 
 const app = express();
-app.use('/', function (req, res, next) {
+app.use('*', function (req, res, next) {
 	// 设置请求头为允许跨域
     res.header("Access-Control-Allow-Origin", "*");
     // 设置服务器支持的所有头信息字段
@@ -20,6 +20,10 @@ app.use(express.urlencoded({extended:false}))
 // 处理json格式的参数
 app.use(express.json())
 app.use('/',router)
+app.listen('4000',function(){
+    console.log('running...')
+})
+
 const server = new proxy.Server(app);
 
 module.exports.handler = async (req, res, context) => {
