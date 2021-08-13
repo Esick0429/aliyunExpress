@@ -177,7 +177,7 @@ exports.login = async (req, res) => {
     let userphone = req.body.userphone
     let password = req.body.password
 
-    let data = await db.find('lewei_admin', 'user_info', {deleted: false,phone: userphone},{})
+    let data = await db.find('lewei_admin', 'user_info', {deleted: false,banned:false,phone: userphone},{})
     console.log(data[0]);
     if (data[0]) { //验证账号
         let newpass = passwordEncrypt(password)
@@ -215,7 +215,7 @@ exports.login = async (req, res) => {
 }
 //用户退出
 exports.quit = (req, res) => {
-    console.log(req.headers);
+    //console.log(req.headers);
     delectRedis(req.headers.token, function (value) {
         console.log(value);
         res.json({
@@ -229,7 +229,7 @@ exports.quit = (req, res) => {
 //路由
 exports.router =async (req, res) => {
 
-    console.log(req.headers);
+    //console.log(req.headers);
     //let domain = req.headers.domain
     let token = req.headers.token
     let user = JSON.parse(decrypt(token)) //解析token获取userId
@@ -313,6 +313,7 @@ exports.addUser =async (req, res) => {
         user.phone = userphone
         user.password = passwordEncrypt(req.body.password)
         user.role_id = req.body.role
+        user.roleName = req.body.roleName
         user.deleted = false
         user.banned = false
         user.create_time = (new Date()).getTime()
@@ -384,8 +385,12 @@ exports.updateUser =async (req, res) => {
     user.username = req.body.username
     user.sex = req.body.sex
     user.phone = req.body.userphone
-    user.password = passwordEncrypt(req.body.password)
+    if(req.body.password){
+        user.password = passwordEncrypt(req.body.password)
+    }
+    user.banned = req.body.banned? req.body.banned : false
     user.role_id = req.body.role
+    user.roleName = req.body.roleName
     user.update_time = (new Date()).getTime()
     console.log(user);
 

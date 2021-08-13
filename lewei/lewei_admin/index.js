@@ -24,6 +24,8 @@ app.use('/', function (req, res, next) {
             if(!value){
                 res.send('token错误')
                 return
+            }else{
+                next()
             }
         })
     }else{
