@@ -241,17 +241,32 @@ exports.router =async (req, res) => {
     let role =await db.find('lewei_admin', 'role_info', {deleted: false,_id: ObjectId(users[0].role_id)}, {create_time: 1}) //通过roleId查询routerId
     console.log(role[0]);
     let arr = role[0].router_id
-    var data = []
+    var data = new Array(4)
     const pp = new Promise(async (resolve, reject) => {
         for (var i = 0; i < arr.length; i++) {
             let res= await db.find('lewei_admin', 'router_info', {_id: ObjectId(arr[i])}, {create_time: 1}) //查找router——config
-            if (res[0].router_name == '首页' || res[0].router_name == '首页(c)') {
-                data.splice(0, 0, res[0])
-            } else {
-                data.push(res[0])
+            switch (res[0].router_name) {
+                case '首页':
+                    data[0] = res[0]
+                    break
+                case '学学':
+                    data[1] = res[0]
+                    break
+                case '内容':
+                    data[2] = res[0]
+                    break
+                case '运营':
+                    data[3] = res[0]
+                    break
+                default:
+                    break
             }
+            var list = data.filter((item)=>{
+                return item
+            })
+            console.log(list,'sjkfhsksfghfslf');
 
-            if (data.length == arr.length) {
+            if (data.length === arr.length) {
                 resolve(data)
             }
         }
@@ -410,7 +425,7 @@ var varify =async function(data){
     let user = JSON.parse(decrypt(data))
     let result = await db.find("lewei_admin", "user_info",{deleted:false,user_id:user.userId},{})
     console.log(result[0],'yz');
-    if (result[0].user_id =='6110987a70dba80808074d64' || result[0].user_id == '61126850a12dd55b096dbfb1') {
+    if (result[0].user_id === '6110987a70dba80808074d64' || result[0].user_id === '61126850a12dd55b096dbfb1') {
         return true
     }else{
         return false

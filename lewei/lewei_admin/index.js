@@ -22,7 +22,7 @@ app.use('/', function (req, res, next) {
         let  value = await decrypt_token(domain,token,function(){//验证token
             console.log(value ,'yz');
             if(!value){
-                res.send('token错误')
+                res.json({code:800,message:'token错误'})
                 return
             }else{
                 next()
