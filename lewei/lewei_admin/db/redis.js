@@ -84,8 +84,8 @@ async function delectRedis(data,callback){
  * callback 返回验证token值
 */
 function decrypt_token(data,token,callback){
-    console.log(data,token,config);
-    console.log(`${config.environ_name}admin-api.lewei.life`);
+    console.log(data,token);
+    //console.log(`${config.environ_name}admin-api.lewei.life`);
     let domin = `${config.environ_name}admin-api.lewei.life`
     if(data == domin){  //验证域名
 
