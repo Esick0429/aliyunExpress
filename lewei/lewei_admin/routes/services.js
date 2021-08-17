@@ -79,13 +79,12 @@ exports.getRole = async (req, res) => {
 }
 //新增角色
 exports.addRole = async (req, res) => {
-    let routerInfo = req.body.checkList
+    let routerId = req.body.checkList
     let roleName = req.body.roleName
-    let routerId = []
     let routerName = []
-    for (let i of routerInfo) {
-        routerId.push(i.id)
-        routerName.push(i.label)
+    for (let i of routerId) {
+        let data = await db.findAll('lewei_admin', 'router_info', { _id: ObjectId(i) })
+        routerName.push(data.res.router_name)
     }
     var data = {
         router_id: routerId,
@@ -105,30 +104,35 @@ exports.addRole = async (req, res) => {
 
 exports.dRole = async (req, res) => {
     let id = req.body.id
-    await db.dRole("lewei_admin", "role_info", {
-        _id: ObjectId(id)
-    }, {
-        $set: {
-            deleted: true
-        }
-    });
-    res.json({
-        code: 0,
-        message: '成功'
-    })
+    let data = await db.findAll('lewei_admin','user_info',{role_id:{$in:[id]},deleted:false})
+    if(data.total === 0){
+        await db.dRole("lewei_admin", "role_info", {
+            _id: ObjectId(id)
+        }, {
+            $set: {
+                deleted: true
+            }
+        });
+        res.json({
+            code: 0,
+            message: '成功'
+        })
+    }else{res.json({code:500,message:'此角色有关联用户，请先删除关联用户'})}
 }
 
 
 exports.updateInfo = async (req, res) => {
     let id = req.body.id
-    let routerInfo = req.body.checkList
+    if (id == '6110cf1cee4a024d7959e564' && id == '6112648152289de8fdaf9be6') {
+        res.json({ code: 400, message: '参数不合法' })
+    }else{
+    let routerId = req.body.checkList
     let roleName = req.body.roleName
     let updateTime = new Date().getTime()
-    let routerId = []
     let routerName = []
-    for (let i of routerInfo) {
-        routerId.push(i.id)
-        routerName.push(i.label)
+    for (let i of routerId) {
+        let data = await db.findAll('lewei_admin', 'router_info', { _id: ObjectId(i) })
+        routerName.push(data.res.router_name)
     }
     await db.updateInfo("lewei_admin", "role_info", {
         _id: ObjectId(id)
@@ -144,6 +148,7 @@ exports.updateInfo = async (req, res) => {
         code: 0,
         message: '成功'
     })
+    }
 }
 
 //用户
