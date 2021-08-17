@@ -4,15 +4,20 @@ var {decrypt} = require('./token')
 var config = require('../config/config.js')
 //var url = config.redis_conf.host
 console.log(url);
-//设置存储token
-function setRedis(data,token,callback){
+var connect = function(){
     const redisClient = redis.createClient({host:url,prot:6379,no_ready_check:true})
     redisClient.auth('Lw135246', () => {
-        console.log('通过认证');
+        console.log('redis连接');
     })
     redisClient.on('error', err => {
         console.error(err)
     })
+    return redisClient
+}
+
+//设置存储token
+async function setRedis(data,token,callback){
+    let redisClient =await connect()
     redisClient.select(1,function(err,result){
         if (err) {
             console.log(err);
@@ -33,14 +38,8 @@ function setRedis(data,token,callback){
 }
 
 //查找token
-function getRedis(data,callback){
-    const redisClient = redis.createClient(6379,url)
-    redisClient.auth('Lw135246', () => {
-        console.log('通过认证');
-    })
-    redisClient.on('error', err => {
-        console.error(err)
-    })
+async function getRedis(data,callback){
+    let redisClient =await connect()
     redisClient.select(1,function(err,result){
         if (err) {
             console.log(err);
@@ -58,14 +57,8 @@ function getRedis(data,callback){
 /*
 *清除token
 */
-function delectRedis(data,callback){
-    const redisClient = redis.createClient(6379,url)
-    redisClient.auth('Lw135246', () => {
-        console.log('通过认证');
-    })
-    redisClient.on('error', err => {
-        console.error(err)
-    })
+async function delectRedis(data,callback){
+    let redisClient =await connect()
     redisClient.select(1,function(err,result){
         if (err) {
             console.log(err);
@@ -91,8 +84,8 @@ function delectRedis(data,callback){
  * callback 返回验证token值
 */
 function decrypt_token(data,token,callback){
-    console.log(data,token,config);
-    console.log(`${config.environ_name}admin-api.lewei.life`);
+    console.log(data,token);
+    //console.log(`${config.environ_name}admin-api.lewei.life`);
     let domin = `${config.environ_name}admin-api.lewei.life`
     if(data == domin){  //验证域名
 

@@ -1,199 +1,314 @@
-const db = require('../db/db.js')
+const db = require('../db/mongo.js')
 // const Long = require('mongodb').Long
 const ObjectId = require('mongodb').ObjectId
-const {encrypt,decrypt,passwordEncrypt } =  require( '../db/token');
-const {setRedis,delectRedis} = require('../db/redis')
+const {
+    encrypt,
+    decrypt,
+    passwordEncrypt
+} = require('../db/token');
+const {
+    setRedis,
+    delectRedis
+} = require('../db/redis')
 
-exports.pageing = (req,res)=>{
-  console.log(req.query)
-  const skip = parseInt(req.body.pageIndex)-1;
-  const limit = parseInt(req.body.pageSize);
-  db.pageing('live','anchor_info',skip,limit,{create_time: -1},function(total,reslut) {
-      // console.log(total,reslut);
-      res.json({code:0,data:{total:total,anchors:reslut}})
-  });
+exports.pageing = (req, res) => {
+    console.log(req.query)
+    const skip = parseInt(req.body.pageIndex) - 1;
+    const limit = parseInt(req.body.pageSize);
+    db.pageing('live', 'anchor_info', skip, limit, {
+        create_time: -1
+    }, function (total, reslut) {
+        // console.log(total,reslut);
+        res.json({
+            code: 0,
+            data: {
+                total: total,
+                anchors: reslut
+            }
+        })
+    });
 }
-exports.getRouter = (req,res) =>{
+exports.getRouter = async (req, res) => {
     let routerList = []
-    db.findAll('lewei_admin','router_info',{deleted:false},function(total,data){
-         for( let i of data){
-            routerList.push({
-                    routerId: i._id,
-                    routerName: i.router_name,
-                    config: i.config,
-                    createTime: i.create_time
-            })
-        }
-        res.json({code:0,data:{total:total,list:routerList},message:'成功'})
+    let data = await db.findAll('lewei_admin', 'router_info', {
+        deleted: false
     })
+    for (let i of data.res) {
+        routerList.push({
+            routerId: i._id,
+            routerName: i.router_name,
+            config: i.config,
+            createTime: i.create_time
+        })
+    }
+    res.json({
+        code: 0,
+        data: {
+            total: data.total,
+            list: roleList
+        },
+        message: '成功'
+    })
+    console.log('查询成功')
 }
-exports.getRole = (req,res)=>{
+exports.getRole = async (req, res) => {
+    let value =await varify(req.headers.token)
+    console.log(value,'varify');
+    if (!value) {//权限校验
+        return
+    }
+
     let roleList = []
-    db.findAll('lewei_admin','role_info',{deleted:false},function(total,data) {
-        for( let i of data){
-            roleList.push({
-                router: 
-                        {
-                            routerId: i.router_id,
-                            routerName:i.router_name,
-                        }
-                        ,
-                roleId: i._id,
-                roleName: i.role_name,
-                create_time:i.create_time,
-            })
-        }
-        res.json({code:0,data:{total:total,list:roleList},message:'成功'})
-        console.log('查询成功')
+    let data = await db.findAll('lewei_admin', 'role_info', {
+        deleted: false
+    });
+    for (let i of data.res) {
+        roleList.push({
+            router: {
+                routerId: i.router_id,
+                routerName: i.router_name,
+            },
+            roleId: i._id,
+            roleName: i.role_name,
+            create_time: i.create_time,
+        })
+    }
+    res.json({
+        code: 0,
+        data: {
+            total: data.total,
+            list: roleList
+        },
+        message: '成功'
     })
+    console.log('查询成功')
 }
 //新增角色
-exports.addRole = (req,res)=>{
-  let routerInfo = req.body.checkList
-  let roleName = req.body.roleName
-  let routerId = []
-  let routerName = []
-    for(let i of routerInfo){
-        routerId.push(i.id)
-        routerName.push(i.label)
+exports.addRole = async (req, res) => {
+<<<<<<< HEAD
+    let value =await varify(req.headers.token)
+    console.log(value,'varify');
+    if (!value) {//权限校验
+        return
     }
-  var data={
-    router_id:routerId,
-    role_name:roleName,
-    router_name:routerName,
-    deleted:false,
-    create_time:new Date().getTime(),
-    update_time:new Date().getTime()
-  }
-  db.insertOne("lewei_admin","role_info",data,function(result){
-    res.json({code:0,message:'成功'})
-  })
-}
 
-
-exports.dRole = (req,res)=>{
-    let id = req.body.id
-   db.updateInfo("lewei_admin","role_info",{_id:ObjectId(id)},{$set:{deleted:true}},function(result){
-       res.json({code:0,message:'成功'})
-    });
-}
-
-
-exports.updateInfo = (req,res)=>{
-    let id = req.body.id
     let routerInfo = req.body.checkList
+=======
+    let routerId = req.body.checkList
+>>>>>>> 6b78e5e393e3abb415353de14cde0acd45f582e6
+    let roleName = req.body.roleName
+    let routerName = []
+    for (let i of routerId) {
+        let data = await db.findAll('lewei_admin', 'router_info', { _id: ObjectId(i) })
+        routerName.push(data.res.router_name)
+    }
+    var data = {
+        router_id: routerId,
+        role_name: roleName,
+        router_name: routerName,
+        deleted: false,
+        create_time: new Date().getTime(),
+        update_time: new Date().getTime()
+    }
+    await db.insertOne("lewei_admin", "role_info", data)
+    res.json({
+        code: 0,
+        message: '成功'
+    })
+}
+
+
+exports.dRole = async (req, res) => {
+    let value =await varify(req.headers.token)
+    console.log(value,'varify');
+    if (!value) {//权限校验
+        return
+    }
+
+    let id = req.body.id
+    let data = await db.findAll('lewei_admin','user_info',{role_id:{$in:[id]},deleted:false})
+    if(data.total === 0){
+        await db.dRole("lewei_admin", "role_info", {
+            _id: ObjectId(id)
+        }, {
+            $set: {
+                deleted: true
+            }
+        });
+        res.json({
+            code: 0,
+            message: '成功'
+        })
+    }else{res.json({code:500,message:'此角色有关联用户，请先删除关联用户'})}
+}
+
+
+exports.updateInfo = async (req, res) => {
+    let value =await varify(req.headers.token)
+    console.log(value,'varify');
+    if (!value) {//权限校验
+        return
+    }
+    
+    let id = req.body.id
+    if (id == '6110cf1cee4a024d7959e564' && id == '6112648152289de8fdaf9be6') {
+        res.json({ code: 400, message: '参数不合法' })
+    }else{
+    let routerId = req.body.checkList
     let roleName = req.body.roleName
     let updateTime = new Date().getTime()
-    let routerId = []
     let routerName = []
-     for(let i of routerInfo){
-        routerId.push(i.id)
-        routerName.push(i.label)
+    for (let i of routerId) {
+        let data = await db.findAll('lewei_admin', 'router_info', { _id: ObjectId(i) })
+        routerName.push(data.res.router_name)
     }
-   db.updateInfo("lewei_admin","role_info",{_id:ObjectId(id)},{$set:{router_name:routerName,router_id:routerId,role_name:roleName,update_time:updateTime}},function(result){
-       res.json({code:0,message:'成功'})
+    await db.updateInfo("lewei_admin", "role_info", {
+        _id: ObjectId(id)
+    }, {
+        $set: {
+            router_name: routerName,
+            router_id: routerId,
+            role_name: roleName,
+            update_time: updateTime
+        }
     });
+    res.json({
+        code: 0,
+        message: '成功'
+    })
+    }
 }
 
 //用户
-exports.login =  (req,res)=>{
-     
+exports.login = async (req, res) => {
+
     console.log(req.body);
     let userphone = req.body.userphone
     let password = req.body.password
 
-    db.findAll('lewei_admin','user_info',{deleted:false,phone:userphone},function(total,data) {
-        console.log(data[0]);
-        if(data[0]){//验证账号
-            let newpass = passwordEncrypt(password)
-            console.log(newpass)
-            if(newpass == data[0].password){//验证密码
-    
-                let tokendata = {}
-                tokendata.userId = data[0].user_id
-                tokendata.appId = 'admin-api'
-                tokendata.loginTime = String((new Date()).getTime())
-                tokendata = JSON.stringify(tokendata)
-                console.log(tokendata);
+    let data = await db.find('lewei_admin', 'user_info', {deleted: false,banned:false,phone: userphone},{})
+    console.log(data[0]);
+    if (data[0]) { //验证账号
+        let newpass = passwordEncrypt(password)
+        console.log(newpass)
+        if (newpass == data[0].password) { //验证密码
 
-                //创建token
-                let token = encrypt(tokendata)
-                console.log(token);                
-                
-                //存入token到redis
-                console.log(userphone)
-                
-                let key = `zero_admin_token:${data[0].user_id}:admin-api`
-                console.log(key);
-                setRedis(key,token,function(value){
-                    console.log(value)
-                    res.json({"code":0,"data":token,"message":'成功'})    
-                })           
-            }
-            else{
-                res.end('密码错误')
-            }
+            let tokendata = {}
+            tokendata.userId = data[0].user_id
+            tokendata.appId = 'admin-api'
+            tokendata.loginTime = String((new Date()).getTime())
+            tokendata = JSON.stringify(tokendata)
+            console.log(tokendata);
+
+            //创建token
+            let token = encrypt(tokendata)
+            console.log(token);
+
+            //存入token到redis
+            let key = `zero_admin_token:${data[0].user_id}:admin-api`
+            console.log(key);
+            setRedis(key, token, function (value) {
+                console.log(value)
+                res.json({
+                    "code": 0,
+                    "data": token,
+                    "message": '成功'
+                })
+            })
+        } else {
+            res.end('密码错误')
         }
-        else{
-            res.end('账号不存在')
-        }
-    })
-   
+    } else {
+        res.end('账号不存在')
+    }
 }
 //用户退出
-exports.quit = (req,res)=>{
-    console.log(req.headers);
-    delectRedis(req.headers.token,function(value){
+exports.quit = (req, res) => {
+    //console.log(req.headers);
+    delectRedis(req.headers.token, function (value) {
         console.log(value);
-        res.json({"code":0,"data":null,"message":'成功'})
+        res.json({
+            "code": 0,
+            "data": null,
+            "message": '成功'
+        })
     })
-    
+
 }
 //路由
-exports.router = (req,res)=>{
+exports.router =async (req, res) => {
 
-    console.log(req.headers);
+    //console.log(req.headers);
     //let domain = req.headers.domain
     let token = req.headers.token
-    let user = JSON.parse(decrypt(token))//解析token获取userId
+    let user = JSON.parse(decrypt(token)) //解析token获取userId
 
     //获取router
     console.log(user.userId);
-    db.find('lewei_admin','user_info',{deleted:false,user_id:user.userId},{create_time:1},function(user) {//查询roleId
-        console.log(user[0]);
-        db.find('lewei_admin','role_info',{deleted:false,_id:ObjectId(user[0].role_id)},{create_time:1},function(role) { //通过roleId查询routerId
-            console.log(role[0]);
-                    let arr = role[0].router_id
-                    var data = []
-                    const pp = new Promise( (resolve,reject)=>{
-                        for(var i= 0;i<arr.length;i++){
-                            db.find('lewei_admin','router_info',{_id:ObjectId(arr[i])},{create_time:1},function(res){//查找router——config
-                                console.log(res);
-                                data.push(res[0])
-                                if (data.length == arr.length) {
-                                    resolve(data)
-                                }
-                            })
-                        }
-                    })
-                   
-                    pp.then((data)=>{
-                        console.log(data,'22');
-                        var result = []
-                        for (let index = 0; index < data.length; index++) {
-                            let object = {}
-                            object.routerName = data[index].router_name;
-                            object.config = data[index].config[0]
-                            console.log(object);
-                            result.push(object)
-                        }
-                        res.json({"code":0,"data":{routerList:result},"message":'成功'})
-                    })
-        })
+    let users = await db.find('lewei_admin', 'user_info', {deleted: false,user_id: user.userId}, {create_time: 1}) //查询roleId
+    console.log(users[0]);
+    let role =await db.find('lewei_admin', 'role_info', {deleted: false,_id: ObjectId(users[0].role_id)}, {create_time: 1}) //通过roleId查询routerId
+    console.log(role[0]);
+    let arr = role[0].router_id
+    var data = new Array(4)
+    const pp = new Promise(async (resolve, reject) => {
+        for (var i = 0; i < arr.length; i++) {
+            let res= await db.find('lewei_admin', 'router_info', {_id: ObjectId(arr[i])}, {create_time: 1}) //查找router——config
+            switch (res[0].router_name) {
+                case '首页':
+                    data[0] = res[0]
+                    break
+                case '学学':
+                    data[1] = res[0]
+                    break
+                case '内容':
+                    data[2] = res[0]
+                    break
+                case '运营':
+                    data[3] = res[0]
+                    break
+                default:
+                    break
+            }
+            var list = data.filter((item)=>{
+                return item
+            })
+            console.log(list,'sjkfhsksfghfslf');
+
+            if (data.length === arr.length) {
+                resolve(data)
+            }
+        }
     })
+
+    pp.then((data) => {
+        console.log(data, '22');
+        var result = []
+        for (let index = 0; index < data.length; index++) {
+            let object = {}
+            object.routerName = data[index].router_name;
+            object.config = data[index].config[0]
+            console.log(object);
+            result.push(object)
+        }
+        res.json({
+            "code": 0,
+            "data": {
+                routerList: result
+            },
+            "message": '成功'
+        })
+    })    
+    
 }
 //新建用户
-exports.addUser = (req,res)=>{
+exports.addUser =async (req, res) => {
+    let value =await varify(req.headers.token)
+    console.log(value,'varify');
+    if (!value) {//权限校验
+        return
+    }
+
     let userphone = req.body.userphone
     let reg = /^1(3[0-9]|4[01456879]|5[0-35-9]|6[2567]|7[0-8]|8[0-9]|9[0-35-9])\d{8}$/
     console.log(reg.test(userphone))
@@ -203,64 +318,88 @@ exports.addUser = (req,res)=>{
     console.log(userphone);
 
 
-    db.findAll('lewei_admin','user_info',{deleted:false,phone:userphone},function(total,data) {
-        console.log(data);
-        if (data[0]) { ///判断手机号是否存在
-            console.log('手机号已注册');
-            res.json({code:0,data:null,message:'手机号已注册'})
-        }else{
+    let data =await db.findAll('lewei_admin', 'user_info', {deleted: false,phone: userphone})
+    console.log(data);
+    if (data[0]) { ///判断手机号是否存在
+        console.log('手机号已注册');
+        res.json({
+            code: 0,
+            data: null,
+            message: '手机号已注册'
+        })
+    } else {
 
-            //创建用户
-            let user = {}
-            user.avatar = req.body.avatar
-            user.username = req.body.username
-            user.sex = req.body.sex
-            user.phone = userphone
-            user.password = passwordEncrypt(req.body.password)
-            user.role_id = req.body.role
-            user.deleted = false
-            user.banned = false
-            user.create_time = (new Date()).getTime()
-            user.update_time = (new Date()).getTime()
-            user._id = ObjectId()
-            user.user_id  = user._id.toString()
-            console.log(user);
+        //创建用户
+        let user = {}
+        user.avatar = req.body.avatar
+        user.username = req.body.username
+        user.sex = req.body.sex
+        user.phone = userphone
+        user.password = passwordEncrypt(req.body.password)
+        user.role_id = req.body.role
+        user.roleName = req.body.roleName
+        user.deleted = false
+        user.banned = false
+        user.create_time = (new Date()).getTime()
+        user.update_time = (new Date()).getTime()
+        user._id = ObjectId()
+        user.user_id = user._id.toString()
+        console.log(user);
 
-            //插入
-            db.insertOne("lewei_admin","user_info",user,function(result){
-                console.log(result);
-                res.json({code:0,data:null,message:'成功'})  
-            })
-            
-            
-        }
-    })
-}
-//用户列表
-exports.getUser = (req,res)=>{
-    console.log(req.query);
-    let pageSize = Number(req.query.pageSize)? Number(req.query.pageSize) : 10
-    let pageIndex = (Number(req.query.pageIndex)-1)*pageSize? (Number(req.query.pageIndex)-1)*pageSize:0
-    console.log(pageSize,pageIndex);
-    db.pageing('lewei_admin','user_info',{deleted:false},pageIndex,pageSize,{create_time: -1},function(total,reslut) {
-        console.log(total,reslut);
-        res.json({code:0,data:{total:total,data:reslut}})
-    });
-}
-//用户删除
-exports.dUser = (req,res)=>{//删除
-    console.log(req.path);
-    var user_id = req.path.substr(1)
-    console.log(user_id);
-    db.updateInfo("lewei_admin","user_info",{'user_id':user_id},{$set:{'deleted':true,'update_time':(new Date()).getTime()}},function(result){
+        //插入
+        let result = await db.insertOne("lewei_admin", "user_info", user)
         console.log(result);
-        res.json({"code":0,"data":null,"message":'成功'}) //
-        //res.end(JSON.stringify({"code":0,"data":null,"message":'成功'})) 
-    });
+        res.json({
+            code: 0,
+            data: null,
+            message: '成功'
+        })
+    }
     
 }
+//用户列表
+exports.getUser = async (req, res) => {
+    console.log(req.query);
+    let value =await varify(req.headers.token)
+    console.log(value,'varify');
+    if (!value) {//权限校验
+        return
+    }
+    let pageSize = Number(req.query.pageSize) ? Number(req.query.pageSize) : 10
+    let pageIndex = (Number(req.query.pageIndex) - 1) * pageSize ? (Number(req.query.pageIndex) - 1) * pageSize : 0
+    console.log(pageSize, pageIndex);
+    var {total,reslut}= await db.pageing('lewei_admin', 'user_info', {deleted: false}, pageIndex, pageSize, {create_time: -1})
+    console.log(total, reslut);
+    res.json({code: 0,data: {total: total,data: reslut}}) 
+}
+//用户删除
+exports.dUser =async (req, res) => { //删除
+    console.log(req.path);
+    let value =await varify(req.headers.token)
+    console.log(value,'varify');
+    if (!value) {//权限校验
+        return
+    }
+
+    var user_id = req.path.substr(1)
+    console.log(user_id);
+    let result = await db.updateInfo("lewei_admin", "user_info", {'user_id': user_id}, {$set: {'deleted': true,'update_time': (new Date()).getTime()}})
+    console.log(result);
+    res.json({
+        "code": 0,
+        "data": null,
+        "message": '成功'
+    }) //
+        //res.end(JSON.stringify({"code":0,"data":null,"message":'成功'})) 
+}
 //编辑用户
-exports.updateUser = (req,res)=>{
+exports.updateUser =async (req, res) => {
+    let value =await varify(req.headers.token)
+    console.log(value,'varify');
+    if (!value) {//权限校验
+        return
+    }
+
     let userId = req.path.substr(8)
     console.log(userId);
     console.log(req.body)
@@ -270,15 +409,34 @@ exports.updateUser = (req,res)=>{
     user.username = req.body.username
     user.sex = req.body.sex
     user.phone = req.body.userphone
-    user.password = passwordEncrypt(req.body.password)
+    if(req.body.password){
+        user.password = passwordEncrypt(req.body.password)
+    }
+    user.banned = req.body.banned? req.body.banned : false
     user.role_id = req.body.role
+    user.roleName = req.body.roleName
     user.update_time = (new Date()).getTime()
     console.log(user);
 
     //更新
-    db.updateInfo("lewei_admin","user_info",{'user_id':userId},{$set:user},function(result){
-        console.log(result);
-        res.json({"code":0,"data":null,"message":'成功'}) //
-        //res.end(JSON.stringify({"code":0,"data":null,"message":'成功'})) 
-    });
+    let result = await db.updateInfo("lewei_admin", "user_info", {'user_id': userId}, {$set: user})
+    console.log(result);
+    res.json({
+        "code": 0,
+        "data": null,
+        "message": '成功'
+    }) //
+}
+
+//超管权限验证
+var varify =async function(data){
+    
+    let user = JSON.parse(decrypt(data))
+    let result = await db.find("lewei_admin", "user_info",{deleted:false,user_id:user.userId},{})
+    console.log(result[0],'yz');
+    if (result[0].user_id === '6110987a70dba80808074d64' || result[0].user_id === '61126850a12dd55b096dbfb1') {
+        return true
+    }else{
+        return false
+    }
 }
