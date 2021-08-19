@@ -5,7 +5,7 @@ const router = require('./routes/index')
 const getRawBody = require('raw-body');
 const {decrypt_token} = require('./db/redis')
 const app = express();
-app.use('/', function (req, res, next) {
+app.use('/', async function (req, res, next) {
 	// 设置请求头为允许跨域
     res.header("Access-Control-Allow-Origin", "*");
     // 设置服务器支持的所有头信息字段
@@ -19,7 +19,7 @@ app.use('/', function (req, res, next) {
         let domain = req.headers.domain
         let token = req.headers.token
         //console.log(domain,token)
-        let  value = await decrypt_token(domain,token,function(){//验证token
+        await decrypt_token(domain,token,function(value){//验证token
             console.log(value ,'yz');
             if(!value){
                 res.json({code:800,message:'token错误'})
@@ -29,7 +29,7 @@ app.use('/', function (req, res, next) {
             }
         })
     }else{
-        next();
+        next()
     }
     
 });
