@@ -6,7 +6,7 @@ class Verief{
     constructor(){
         
     }
-    authen(url,token,id){
+    async authen(url,token,id){
         if(!url || !token ||!id) throw '参数错误'
         let newToken = JSON.parse(decrypt(token))
         let userId = newToken.userId
