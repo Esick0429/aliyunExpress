@@ -207,10 +207,10 @@ exports.login = async (req, res) => {
                 })
             })
         } else {
-            res.end('密码错误')
+            res.json({code:0,message:'密码错误'})
         }
     } else {
-        res.end('账号不存在')
+        res.json({code:0,message:'账号不存在'})
     }
 }
 //用户退出

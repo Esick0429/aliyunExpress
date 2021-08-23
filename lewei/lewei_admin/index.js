@@ -1,7 +1,7 @@
 const proxy = require('@webserverless/fc-express')
 const express = require('express');
 // const bodyParser = require('body-parser');
-const router = require('./routes/index')
+const router = require('./routes/routers')
 const getRawBody = require('raw-body');
 const {decrypt_token} = require('./db/redis')
 const app = express();
