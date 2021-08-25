@@ -1,5 +1,5 @@
 var redis = require('redis')
-var url = 'r-wz9nomv8cuauf0t1t7pd.redis.rds.aliyuncs.com'
+var url = 'r-wz9mea3oe6dlu55pnd.redis.rds.aliyuncs.com'
 var {decrypt} = require('./token')
 var config = require('../config/config.js')
 //var url = config.redis_conf.host
@@ -87,7 +87,7 @@ function decrypt_token(data,token,callback){
     console.log(data,token);
     //console.log(`${config.environ_name}admin-api.lewei.life`);
     let domin = `${config.environ_name}admin-api.lewei.life`
-    if(data == domin){  //验证域名
+    if(data === domin){  //验证域名
 
         //解析token
         let newToken = JSON.parse(decrypt(token));
@@ -97,7 +97,7 @@ function decrypt_token(data,token,callback){
             //获取token
             getRedis(`zero_admin_token:${newToken.userId}:admin-api`,function(exist_token){
                 console.log(exist_token,'11');
-                if (exist_token == token) {
+                if (exist_token === token) {
                     
                     callback(true)
                 }else{

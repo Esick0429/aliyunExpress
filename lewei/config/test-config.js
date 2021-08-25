@@ -4,7 +4,7 @@ module.exports ={
     //域名上的项目名, environ_name + app + lewei.life 构成完整域名
     apps :['live', 'pad', 'svideo', 'anchor', 'admin-api'],
 
-
+    redis_url : 'r-wz9nomv8cuauf0t1t7pd.redis.rds.aliyuncs.com',
     mongodb_url : 'mongodb://root:Lw135246@dds-wz975fe96170f9241908-pub.mongodb.rds.aliyuncs.com:3717,dds-wz975fe96170f9242412-pub.mongodb.rds.aliyuncs.com:3717/admin?replicaSet=mgset-46339342',
     redis_conf : {
         'host': 'r-wz9nomv8cuauf0t1t7.redis.rds.aliyuncs.com',
