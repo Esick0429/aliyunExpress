@@ -356,10 +356,20 @@ exports.getUser = async (req, res) => {
     // if (!value) {//权限校验
     //     return
     // }
+    let filter ={  //筛选条件
+        'deleted': false
+    }
+    if(req.query.username && req.query.username !== 'null'){
+        filter.username = {'$regex':req.query.username}
+    }
+    else if(req.query.banned && req.query.banned !== 'null'){
+        filter.banned = (req.query.banned === 'true')
+    } 
+    console.log(filter)
     let pageSize = Number(req.query.pageSize) ? Number(req.query.pageSize) : 10
     let pageIndex = (Number(req.query.pageIndex) - 1) * pageSize ? (Number(req.query.pageIndex) - 1) * pageSize : 0
     console.log(pageSize, pageIndex);
-    var data = await db.pageing('lewei_admin', 'user_info', {deleted: false}, pageIndex, pageSize, {create_time: -1})
+    var data = await db.pageing('lewei_admin', 'user_info', filter, pageIndex, pageSize, {create_time: -1})
     console.log(data.total, data.res);
     res.json({code: 0,data: {total: data.total,data: data.res}}) 
 }

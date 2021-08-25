@@ -6,7 +6,7 @@ class Verief{
     constructor(){
         
     }
-    async authen(url,token,id){
+    async authen(url,token,id){ //url数据库地址,token ,routerid
         if(!url || !token ||!id) throw '参数错误'
         let newToken = JSON.parse(decrypt(token))
         let userId = newToken.userId
@@ -18,15 +18,15 @@ class Verief{
             console.log(user)
             let ro = await db.find(url,'lewei_admin','role_info',{_id:ObjectId(user[0].role_id)},{})
             let role = ro[0].router_id
-            let router = await db.find(url,'lewei_admin', 'router_info', {}, {}) //查找router
+            //let router = await db.find(url,'lewei_admin', 'router_info', {}, {}) //查找router
             for (var j = 0; j < role.length; j++) {
-                for (var i = 0; i < router.length; i++) {
-                    if(id === router[i]._id.toString() && role[j] === id){
+                //for (var i = 0; i < router.length; i++) {
+                    if(role[j] === id){
                         return true
                     }
-                }
+                //}
             }
-            if(j === role.length && i === router.length){
+            if(j === role.length){
                 return false
             }
             
