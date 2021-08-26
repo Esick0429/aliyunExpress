@@ -170,6 +170,42 @@ exports.updateInfo = async (req, res) => {
     }
 }
 
+
+
+exports.getUserInfo  = async (req,res) => {
+    const token = req.headers.token
+    const user = JSON.parse(decrypt(token))
+    console.log(user);
+    const userId = user.userId
+    let data = await db.findAll('lewei_admin','user_info',{_id:ObjectId(userId)})
+    res.json({code:0,data:{total:data.total,reslut:data.reslut},message:'成功'})
+    
+}
+
+exports.changePassword = async (req,res) =>{
+    const token = req.headers.token
+    const user = JSON.parse(decrypt(token))
+    const userId = user.userId
+    console.log(userId)
+    const oldPwd = passwordEncrypt(req.body.oldPass)
+    const newPwd = passwordEncrypt(req.body.checkPass)
+    let data = await db.findAll('lewei_admin','user_info',{_id:ObjectId(userId)})
+    if(oldPwd !== data.reslut[0].password){
+        res.json({code:400,message:'原密码错误'})
+    }else{
+        db.updateInfo('lewei_admin','user_info', { _id: ObjectId(userId) }, { $set:{password:newPwd}})
+        res.json({code:0,message:'修改成功'})
+    }
+}
+
+
+
+
+
+
+
+
+
 //用户
 exports.login = async (req, res) => {
 

@@ -11,6 +11,8 @@ router.post('/updateInfo',services.updateInfo)
 
 //用户
 router.post('/login',services.login)
+router.get('/getUserInfo',services.getUserInfo)
+router.post('/changePassword',services.changePassword)
 router.post('/quit',services.quit)
 router.post('/router',services.router)
 router.post('/create',services.addUser)
