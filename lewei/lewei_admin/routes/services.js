@@ -243,10 +243,10 @@ exports.login = async (req, res) => {
                 })
             })
         } else {
-            res.json({code:0,message:'密码错误'})
+            res.json({code:4444,message:'密码错误'})
         }
     } else {
-        res.json({code:0,message:'账号不存在'})
+        res.json({code:4444,message:'账号不存在'})
     }
 }
 //用户退出
@@ -350,7 +350,7 @@ exports.addUser =async (req, res) => {
     if (data[0]) { ///判断手机号是否存在
         console.log('手机号已注册');
         res.json({
-            code: 0,
+            code: 4444,
             data: null,
             message: '手机号已注册'
         })
