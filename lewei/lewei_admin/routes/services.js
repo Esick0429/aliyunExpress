@@ -90,9 +90,11 @@ exports.addRole = async (req, res) => {
     //     return
     // }
     if(!req.body.checkList){
+        res.json({code:400,message:'参数错误'})
         return
     }
     if(!req.body.roleName){
+        res.json({code:400,message:'参数错误'})
         return
     }
     let routerId = req.body.checkList
@@ -158,9 +160,9 @@ exports.updateInfo = async (req, res) => {
         res.json({code:400,message:'参数错误'})
         return
     }
-    // if (id === '6110cf1cee4a024d7959e564' && id === '6112648152289de8fdaf9be6') {
-    //     res.json({ code: 400, message: '参数不合法' })
-    // }else{
+    if (id === '6110cf1cee4a024d7959e564' && id === '6112648152289de8fdaf9be6') {
+        res.json({ code: 400, message: '参数不合法' })
+    }else{
     let routerId = req.body.checkList
     let roleName = req.body.roleName
     let updateTime = new Date().getTime()
@@ -183,7 +185,7 @@ exports.updateInfo = async (req, res) => {
         code: 0,
         message: '成功'
     })
-    //}
+    }
 }
 
 
@@ -277,7 +279,7 @@ exports.login = async (req, res) => {
 exports.quit = (req, res) => {
     //console.log(req.headers);
     delectRedis(req.headers.token, function (value) {
-        console.log(value);
+        console.log(value)
         res.json({
             "code": 0,
             "data": null,
@@ -388,7 +390,7 @@ exports.addUser =async (req, res) => {
         res.json({code:400,message:'参数错误'})
         return
     }
-
+    
 
     let data =await db.findAll('lewei_admin', 'user_info', {deleted: false,phone: userphone})
     console.log(data);
@@ -416,11 +418,11 @@ exports.addUser =async (req, res) => {
         user.update_time = (new Date()).getTime()
         user._id = ObjectId()
         user.user_id = user._id.toString()
-        console.log(user);
+        console.log(user)
 
         //插入
         let result = await db.insertOne("lewei_admin", "user_info", user)
-        console.log(result);
+        console.log(result)
         res.json({
             code: 0,
             data: null,
@@ -431,9 +433,9 @@ exports.addUser =async (req, res) => {
 }
 //用户列表
 exports.getUser = async (req, res) => {
-    console.log(req.query);
+    console.log(req.query)
     let value =await varify(req.headers.token)
-    console.log(value,'varify');
+    console.log(value,'varify')
     if (!value) {//权限校验
         return
     }
