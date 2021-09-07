@@ -1,8 +1,8 @@
 var redis = require('redis')
-var url = 'r-wz9mea3oe6dlu55pnd.redis.rds.aliyuncs.com'
+//var url = 'r-wz9mea3oe6dlu55pnd.redis.rds.aliyuncs.com'
 var {decrypt} = require('./token')
 var config = require('../config/config.js')
-//var url = config.redis_conf.host
+var url = config.redis_conf.host
 console.log(url);
 var connect = function(){
     const redisClient = redis.createClient({host:url,prot:6379,no_ready_check:true})

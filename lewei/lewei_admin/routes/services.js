@@ -178,7 +178,7 @@ exports.getUserInfo  = async (req,res) => {
     console.log(user);
     const userId = user.userId
     let data = await db.findAll('lewei_admin','user_info',{_id:ObjectId(userId)})
-    res.json({code:0,data:{total:data.total,reslut:data.reslut},message:'成功'})
+    res.json({code:0,data:{total:data.total,reslut:data.res},message:'成功'})
     
 }
 
@@ -190,7 +190,7 @@ exports.changePassword = async (req,res) =>{
     const oldPwd = passwordEncrypt(req.body.oldPass)
     const newPwd = passwordEncrypt(req.body.checkPass)
     let data = await db.findAll('lewei_admin','user_info',{_id:ObjectId(userId)})
-    if(oldPwd !== data.reslut[0].password){
+    if(oldPwd !== data.res[0].password){
         res.json({code:400,message:'原密码错误'})
     }else{
         db.updateInfo('lewei_admin','user_info', { _id: ObjectId(userId) }, { $set:{password:newPwd}})
@@ -243,10 +243,10 @@ exports.login = async (req, res) => {
                 })
             })
         } else {
-            res.json({code:0,message:'密码错误'})
+            res.json({code:4444,message:'密码错误'})
         }
     } else {
-        res.json({code:0,message:'账号不存在'})
+        res.json({code:4444,message:'账号不存在'})
     }
 }
 //用户退出
@@ -330,11 +330,11 @@ exports.router =async (req, res) => {
 }
 //新建用户
 exports.addUser =async (req, res) => {
-    // let value =await varify(req.headers.token)
-    // console.log(value,'varify');
-    // if (!value) {//权限校验
-    //     return
-    // }
+    let value =await varify(req.headers.token)
+    console.log(value,'varify');
+    if (!value) {//权限校验
+        return
+    }
 
     let userphone = req.body.userphone
     let reg = /^1(3[0-9]|4[01456879]|5[0-35-9]|6[2567]|7[0-8]|8[0-9]|9[0-35-9])\d{8}$/
@@ -387,11 +387,11 @@ exports.addUser =async (req, res) => {
 //用户列表
 exports.getUser = async (req, res) => {
     console.log(req.query);
-    // let value =await varify(req.headers.token)
-    // console.log(value,'varify');
-    // if (!value) {//权限校验
-    //     return
-    // }
+    let value =await varify(req.headers.token)
+    console.log(value,'varify');
+    if (!value) {//权限校验
+        return
+    }
     let filter ={  //筛选条件
         'deleted': false
     }
@@ -412,11 +412,11 @@ exports.getUser = async (req, res) => {
 //用户删除
 exports.dUser =async (req, res) => { //删除
     console.log(req.path);
-    // let value =await varify(req.headers.token)
-    // console.log(value,'varify');
-    // if (!value) {//权限校验
-    //     return
-    // }
+    let value =await varify(req.headers.token)
+    console.log(value,'varify');
+    if (!value) {//权限校验
+        return
+    }
 
     var user_id = req.path.substr(1)
     console.log(user_id);
@@ -431,11 +431,11 @@ exports.dUser =async (req, res) => { //删除
 }
 //编辑用户
 exports.updateUser =async (req, res) => {
-    // let value =await varify(req.headers.token)
-    // console.log(value,'varify');
-    // if (!value) {//权限校验
-    //     return
-    // }
+    let value =await varify(req.headers.token)
+    console.log(value,'varify');
+    if (!value) {//权限校验
+        return
+    }
 
     let userId = req.path.substr(8)
     console.log(userId);
@@ -471,8 +471,8 @@ var varify =async function(data){
     let user = JSON.parse(decrypt(data))
     let result = await db.find("lewei_admin", "user_info",{deleted:false,user_id:user.userId},{})
     console.log(result,'yz');
-    let role = await db.find("lewei_admin", "role_info",{deleted:false,_id:ObjectId(result[0].user_id)},{})
-    console.log(role[0]._id.toString())
+    let role = await db.find("lewei_admin", "role_info",{deleted:false,_id:ObjectId(result[0].role_id)},{})
+    console.log(role[0])
     if (role[0]._id.toString() === '6110cf1cee4a024d7959e564' || role[0]._id.toString() === '6112648152289de8fdaf9be6') {
         return true
     }else{

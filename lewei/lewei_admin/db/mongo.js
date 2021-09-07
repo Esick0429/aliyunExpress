@@ -16,6 +16,48 @@ var connect = function () {
         });
     })
 }
+//统计总数
+exports.count = async function (database, tablename, data){
+    let conn = await connect()
+    var dbbase = conn.db(database);
+    let total = await dbbase.collection(tablename).find(data).count();
+    conn.close();
+    return total
+}
+
+//查询排序
+exports.findSort = async function (database,tablename, data, sort){
+    let conn = await connect()
+    var dbbase = conn.db(database);
+    let res = await dbbase.collection(tablename).find(data).sort(sort).toArray();
+    conn.close();
+    return res
+}
+
+//查排序条数
+exports.findSortLimit = async function (database,tablename, data, sort,limit){
+    let conn = await connect()
+    var dbbase = conn.db(database);
+    // console.log(database, tablename, data, sort, limit);
+
+    let res = await dbbase.collection(tablename).find(data).sort(sort).limit(limit).toArray();
+    conn.close();
+    return res
+}
+
+//普通查询
+exports.findData = async function (database, tablename, data) {
+    let conn = await connect()
+    var dbbase = conn.db(database);
+    // let total = await dbbase.collection(tablename).find(data).count();
+    // console.log(database, tablename, data);
+    let res = await dbbase.collection(tablename).find(data).toArray();
+    // console.log(res);
+    // let result = {total,res}
+    conn.close();
+    return res
+}
+
 
 exports.findAll = async function (database, tablename, data) {
     const conn = await connect()
