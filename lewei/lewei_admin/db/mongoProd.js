@@ -1,8 +1,8 @@
 // import { mongodbUrl } from '../../../config/test-config';
 const config  = require('../config/config.js')
 var MongoClient = require('mongodb').MongoClient;
-// var url = 'mongodb://root:Lw135246@dds-wz9d6a6d9e6c9f141.mongodb.rds.aliyuncs.com:3717,dds-wz9d6a6d9e6c9f142.mongodb.rds.aliyuncs.com:3717/admin?replicaSet=mgset-46400415'
-var url = config.mongodb_url
+var url = 'mongodb://root:Lw135246@dds-wz9d6a6d9e6c9f141957-pub.mongodb.rds.aliyuncs.com:3717,dds-wz9d6a6d9e6c9f142977-pub.mongodb.rds.aliyuncs.com:3717/admin?replicaSet=mgset-46400415'
+// var url = config.mongodb_url
 var connect = function () {
     return new Promise(( resolve, reject ) => {
         MongoClient.connect(url, { useUnifiedTopology: true }, function (err, db) {
