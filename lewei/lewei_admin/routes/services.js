@@ -235,12 +235,12 @@ exports.changePassword = async (req,res) =>{
 //用户
 exports.login = async (req, res) => {
 
-    console.log(req.body);
+    console.log(req.body)
     let userphone = req.body.userphone
     let password = req.body.password
 
     let data = await db.find('lewei_admin', 'user_info', {deleted: false,banned:false,phone: userphone},{})
-    console.log(data[0]);
+    console.log(data[0])
     if (data[0]) { //验证账号
         let newpass = passwordEncrypt(password)
         console.log(newpass)
@@ -326,7 +326,7 @@ exports.router =async (req, res) => {
             var list = data.filter((item)=>{
                 return item
             })
-            console.log(list,'sjkfhsksfghfslf');
+            console.log(list,'sjkfhsksfghfslf')
 
             if (list.length === arr.length) {
                 resolve(list)
@@ -339,7 +339,7 @@ exports.router =async (req, res) => {
         var result = []
         for (let index = 0; index < data.length; index++) {
             let object = {}
-            object.routerName = data[index].router_name;
+            object.routerName = data[index].router_name
             object.config = data[index].config[0]
             console.log(object);
             result.push(object)
@@ -357,7 +357,7 @@ exports.router =async (req, res) => {
 //新建用户
 exports.addUser =async (req, res) => {
     let value =await varify(req.headers.token)
-    console.log(value,'varify');
+    console.log(value,'varify')
     if (!value) {//权限校验
         return
     }
@@ -460,7 +460,7 @@ exports.getUser = async (req, res) => {
 exports.dUser =async (req, res) => { //删除
     console.log(req.path);
     let value =await varify(req.headers.token)
-    console.log(value,'varify');
+    console.log(value,'varify')
     if (!value) {//权限校验
         return
     }
@@ -472,7 +472,7 @@ exports.dUser =async (req, res) => { //删除
         return
     }
     let result = await db.updateInfo("lewei_admin", "user_info", {'user_id': user_id}, {$set: {'deleted': true,'update_time': (new Date()).getTime()}})
-    console.log(result);
+    console.log(result)
     res.json({
         "code": 0,
         "data": null,
@@ -483,7 +483,7 @@ exports.dUser =async (req, res) => { //删除
 //编辑用户
 exports.updateUser = async (req, res) => {
     let value =await varify(req.headers.token)
-    console.log(value,'varify');
+    console.log(value,'varify')
     if (!value) {//权限校验
         return
     }
@@ -518,7 +518,7 @@ exports.updateUser = async (req, res) => {
 
 
     let userId = req.path.substr(8)
-    console.log(userId);
+    console.log(userId)
     console.log(req.body)
     
     //用户
@@ -538,7 +538,7 @@ exports.updateUser = async (req, res) => {
 
     //更新
     let result = await db.updateInfo("lewei_admin", "user_info", {'user_id': userId}, {$set: user})
-    console.log(result);
+    console.log(result)
     res.json({
         "code": 0,
         "data": null,
