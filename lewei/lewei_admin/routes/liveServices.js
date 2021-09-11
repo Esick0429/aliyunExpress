@@ -1,4 +1,4 @@
-const db = require('../db/mongoProd.js')
+const db = require('../db/mongo.js')
 exports.findAnchor = async (req, res) => {
     let pageIndex = Number(req.query.pageIndex) || 1
     let pageSize = Number(req.query.pageSize) || 20
@@ -157,13 +157,10 @@ exports.findAnchor = async (req, res) => {
                     fans_count_list[fans_count_list.length - 1].nowFansCount = 0
                 }
             }
-            for (let i of liveCoutList.values()) {
-                if (flagAnchorId === i.anchorId) {
-                    flag = false
-                    fans_count_list[fans_count_list.length - 1].liveCount = i.liveCount
-                }
-                if (flag === true){
-                    fans_count_list[fans_count_list.length - 1].liveCount = 0
+            fans_count_list[fans_count_list.length - 1].liveCount=0
+            for (let i of live_count) {
+                if (flagAnchorId === i.anchor_id) {
+                    fans_count_list[fans_count_list.length - 1].liveCount++
                 }
             }
             for (let j = 0; j < finalDurationTwo.length; j++) {
