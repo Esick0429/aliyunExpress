@@ -89,7 +89,14 @@ exports.addRole = async (req, res) => {
     // if (!value) {//权限校验
     //     return
     // }
-
+    if(!req.body.checkList){
+        res.json({code:400,message:'参数错误'})
+        return
+    }
+    if(!req.body.roleName){
+        res.json({code:400,message:'参数错误'})
+        return
+    }
     let routerId = req.body.checkList
     let roleName = req.body.roleName
     let routerName = []
@@ -114,13 +121,16 @@ exports.addRole = async (req, res) => {
 
 
 exports.dRole = async (req, res) => {
-    // let value =await varify(req.headers.token)
-    // console.log(value,'varify');
-    // if (!value) {//权限校验
-    //     return
-    // }
+    let value =await varify(req.headers.token)
+    console.log(value,'varify');
+    if (!value) {//权限校验
+        return
+    }
 
     let id = req.body.id
+    if (id === '6110cf1cee4a024d7959e564' && id === '6112648152289de8fdaf9be6') {
+        res.json({ code: 400, message: '参数不合法' })
+    }else{
     let data = await db.findAll('lewei_admin','user_info',{role_id:{$in:[id]},deleted:false})
     if(data.total === 0){
         await db.dRole("lewei_admin", "role_info", {
@@ -135,13 +145,21 @@ exports.dRole = async (req, res) => {
             message: '成功'
         })
     }else{res.json({code:500,message:'此角色有关联用户，请先删除关联用户'})}
+    }
 }
 
 
 exports.updateInfo = async (req, res) => {
     let id = req.body.id
     console.log(id);
-    
+    if(!req.body.checkList){
+        res.json({code:400,message:'参数错误'})
+        return
+    }
+    if(!req.body.roleName){
+        res.json({code:400,message:'参数错误'})
+        return
+    }
     if (id === '6110cf1cee4a024d7959e564' && id === '6112648152289de8fdaf9be6') {
         res.json({ code: 400, message: '参数不合法' })
     }else{
@@ -187,6 +205,14 @@ exports.changePassword = async (req,res) =>{
     const user = JSON.parse(decrypt(token))
     const userId = user.userId
     console.log(userId)
+    if(!req.body.oldPass || !req.body.checkPass || req.body.oldPass > 30 || req.body.checkPass < 6){
+        res.json({code:400,message:'参数错误'})
+        return
+    }
+    if(req.body.oldPass === req.body.checkPass){
+        res.json({code:400,message:'参数错误'})
+        return
+    }
     const oldPwd = passwordEncrypt(req.body.oldPass)
     const newPwd = passwordEncrypt(req.body.checkPass)
     let data = await db.findAll('lewei_admin','user_info',{_id:ObjectId(userId)})
@@ -209,12 +235,12 @@ exports.changePassword = async (req,res) =>{
 //用户
 exports.login = async (req, res) => {
 
-    console.log(req.body);
+    console.log(req.body)
     let userphone = req.body.userphone
     let password = req.body.password
 
     let data = await db.find('lewei_admin', 'user_info', {deleted: false,banned:false,phone: userphone},{})
-    console.log(data[0]);
+    console.log(data[0])
     if (data[0]) { //验证账号
         let newpass = passwordEncrypt(password)
         console.log(newpass)
@@ -253,7 +279,7 @@ exports.login = async (req, res) => {
 exports.quit = (req, res) => {
     //console.log(req.headers);
     delectRedis(req.headers.token, function (value) {
-        console.log(value);
+        console.log(value)
         res.json({
             "code": 0,
             "data": null,
@@ -300,7 +326,7 @@ exports.router =async (req, res) => {
             var list = data.filter((item)=>{
                 return item
             })
-            console.log(list,'sjkfhsksfghfslf');
+            console.log(list,'sjkfhsksfghfslf')
 
             if (list.length === arr.length) {
                 resolve(list)
@@ -313,7 +339,7 @@ exports.router =async (req, res) => {
         var result = []
         for (let index = 0; index < data.length; index++) {
             let object = {}
-            object.routerName = data[index].router_name;
+            object.routerName = data[index].router_name
             object.config = data[index].config[0]
             console.log(object);
             result.push(object)
@@ -331,7 +357,7 @@ exports.router =async (req, res) => {
 //新建用户
 exports.addUser =async (req, res) => {
     let value =await varify(req.headers.token)
-    console.log(value,'varify');
+    console.log(value,'varify')
     if (!value) {//权限校验
         return
     }
@@ -340,10 +366,31 @@ exports.addUser =async (req, res) => {
     let reg = /^1(3[0-9]|4[01456879]|5[0-35-9]|6[2567]|7[0-8]|8[0-9]|9[0-35-9])\d{8}$/
     console.log(reg.test(userphone))
     if (!reg.test(userphone)) { //验证手机号
+        res.json({code:400,message:'参数错误'})
         return
     }
-    console.log(userphone);
-
+    if(!req.body.username || req.body.username.length > 30){
+        res.json({code:400,message:'参数错误'})
+        return
+    }
+    if(!req.body.password || req.body.password.length > 30 || req.body.password.length < 6){
+        res.json({code:400,message:'参数错误'})
+        return
+    }
+    if(!req.body.sex || req.body.sex !== '男' || req.body.sex !== '女'){
+        res.json({code:400,message:'参数错误'})
+        return
+    }
+    let roleList =await db.findAll('lewei_admin','role_info',{deleted: false,_id:ObjectId(req.body.role)})
+    if(!req.body.role || !roleList[0]){
+        res.json({code:400,message:'参数错误'})
+        return
+    }
+    if(!req.body.roleName || roleList[0].role_name !== req.body.roleName){
+        res.json({code:400,message:'参数错误'})
+        return
+    }
+    
 
     let data =await db.findAll('lewei_admin', 'user_info', {deleted: false,phone: userphone})
     console.log(data);
@@ -371,11 +418,11 @@ exports.addUser =async (req, res) => {
         user.update_time = (new Date()).getTime()
         user._id = ObjectId()
         user.user_id = user._id.toString()
-        console.log(user);
+        console.log(user)
 
         //插入
         let result = await db.insertOne("lewei_admin", "user_info", user)
-        console.log(result);
+        console.log(result)
         res.json({
             code: 0,
             data: null,
@@ -386,9 +433,9 @@ exports.addUser =async (req, res) => {
 }
 //用户列表
 exports.getUser = async (req, res) => {
-    console.log(req.query);
+    console.log(req.query)
     let value =await varify(req.headers.token)
-    console.log(value,'varify');
+    console.log(value,'varify')
     if (!value) {//权限校验
         return
     }
@@ -413,15 +460,19 @@ exports.getUser = async (req, res) => {
 exports.dUser =async (req, res) => { //删除
     console.log(req.path);
     let value =await varify(req.headers.token)
-    console.log(value,'varify');
+    console.log(value,'varify')
     if (!value) {//权限校验
         return
     }
 
     var user_id = req.path.substr(1)
-    console.log(user_id);
+    console.log(user_id)
+    if(user_id === '6110cf1cee4a024d7959e564'){
+        res.json({"code": 0,"message": '没有权限'})
+        return
+    }
     let result = await db.updateInfo("lewei_admin", "user_info", {'user_id': user_id}, {$set: {'deleted': true,'update_time': (new Date()).getTime()}})
-    console.log(result);
+    console.log(result)
     res.json({
         "code": 0,
         "data": null,
@@ -430,16 +481,46 @@ exports.dUser =async (req, res) => { //删除
         //res.end(JSON.stringify({"code":0,"data":null,"message":'成功'})) 
 }
 //编辑用户
-exports.updateUser =async (req, res) => {
+exports.updateUser = async (req, res) => {
     let value =await varify(req.headers.token)
-    console.log(value,'varify');
+    console.log(value,'varify')
     if (!value) {//权限校验
         return
     }
+    let userphone = req.body.userphone
+    let reg = /^1(3[0-9]|4[01456879]|5[0-35-9]|6[2567]|7[0-8]|8[0-9]|9[0-35-9])\d{8}$/
+    console.log(reg.test(userphone))
+    if (!reg.test(userphone)) { //验证手机号
+        res.json({code:400,message:'参数错误'})
+        return
+    }
+    if(!req.body.username || req.body.username.length > 30){
+        res.json({code:400,message:'参数错误'})
+        return
+    }
+    if(!req.body.password || req.body.password.length > 30 || req.body.password.length < 6){
+        res.json({code:400,message:'参数错误'})
+        return
+    }
+    if(!req.body.sex || req.body.sex !== '男' || req.body.sex !== '女'){
+        res.json({code:400,message:'参数错误'})
+        return
+    }
+    let roleList =await db.findAll('lewei_admin','role_info',{deleted: false,_id:ObjectId(req.body.role)})
+    if(!req.body.role || !roleList[0]){
+        res.json({code:400,message:'参数错误'})
+        return
+    }
+    if(!req.body.roleName || roleList[0].role_name !== req.body.roleName){
+        res.json({code:400,message:'参数错误'})
+        return
+    }
+
 
     let userId = req.path.substr(8)
-    console.log(userId);
+    console.log(userId)
     console.log(req.body)
+    
     //用户
     let user = {}
     user.avatar = req.body.avatar
@@ -457,7 +538,7 @@ exports.updateUser =async (req, res) => {
 
     //更新
     let result = await db.updateInfo("lewei_admin", "user_info", {'user_id': userId}, {$set: user})
-    console.log(result);
+    console.log(result)
     res.json({
         "code": 0,
         "data": null,
